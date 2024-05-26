@@ -60,8 +60,8 @@ def search_rekam_pasien():
     query = """SELECT p.id_pasien, p.nama, r.nomor_rekam, r.tanggal_pemeriksaan, r.hasil_pemeriksaan, r.diagnosis
             FROM pasien p
             JOIN rekam_medis r ON(p.id_pasien = r.id_pasien)
-            WHERE pasien ilike %s"""
-    cur.execute(query, (f"%{search_pasien}%"))
+            WHERE p.nama ILIKE %s"""
+    cur.execute(query, (f"%{search_pasien}%",))
     data = cur.fetchall()
     if data:
         col_names = [desc[0] for desc in cur.description]
@@ -70,6 +70,7 @@ def search_rekam_pasien():
         print(f"Tidak ada {search_pasien} di dalam rekam medis tersebut")
     cur.close()
     conn.close()
+
 
 def add_rekam():
     conn = connect()
@@ -160,7 +161,7 @@ def menuStaff():
         elif pilihan == 3:
             read_rekam_medis()
         elif pilihan == 4:
-            search_rekam_pasien
+            search_rekam_pasien()
         elif pilihan == 5:
             add_rekam()
         elif pilihan == 6:
