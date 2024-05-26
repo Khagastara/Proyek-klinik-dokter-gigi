@@ -53,6 +53,24 @@ def read_rekam_medis():
     cur.close()
     conn.close()
 
+def search_rekam_pasien():
+    conn = connect()
+    cur = conn.cursor()
+    search_pasien = input("Masukkan nama pasien yang dicari: ")
+    query = """SELECT p.id_pasien, p.nama, r.nomor_rekam, r.tanggal_pemeriksaan, r.hasil_pemeriksaan, r.diagnosis
+            FROM pasien p
+            JOIN rekam_medis r ON(p.id_pasien = r.id_pasien)
+            WHERE pasien ilike %s"""
+    cur.execute(query, (f"%{search_pasien}%"))
+    data = cur.fetchall()
+    if data:
+        col_names = [desc[0] for desc in cur.description]
+        print(tabulate(data, headers=col_names, tablefmt="outline"))
+    else:
+        print(f"Tidak ada {search_pasien} di dalam rekam medis tersebut")
+    cur.close()
+    conn.close()
+
 def add_rekam():
     conn = connect()
     cur = conn.cursor()
@@ -123,16 +141,18 @@ def delete_rekam():
     
 def menuStaff():
     while True:
-        print("Selamat Datang Staff")
+        print("Selamat Datang, Staff")
         print("\nMenu:")
         print("1. Melihat data Pasien")
         print("2. Melihat Data Pembayaran Pasien")
         print("3. Melihat Data Rekam Medis Pasien")
-        print("4. Menambah Data Rekam Medis Pasien")
-        print("5. Memperbarui Data Rekam Medis Pasien")
-        print("6. Menghapus Data Rekam Medis Pasien")
-        print("7. Logout")
-        pilihan = int(input("Masukkan pilihanL: "))
+        print("4. Mencari Pasien dari Data Rekam Medis")
+        print("5. Menambah Data Rekam Medis Pasien")
+        print("6. Memperbarui Data Rekam Medis Pasien")
+        print("7. Menghapus Data Rekam Medis Pasien")
+        print("8. Logout")
+        pilihan = int(input("Masukkan pilihan: "))
+        
         if pilihan == 1:
             read_pasien()
         elif pilihan == 2:
@@ -140,12 +160,14 @@ def menuStaff():
         elif pilihan == 3:
             read_rekam_medis()
         elif pilihan == 4:
-            add_rekam()
+            search_rekam_pasien
         elif pilihan == 5:
-            update_rekam()
+            add_rekam()
         elif pilihan == 6:
-            delete_rekam()
+            update_rekam()
         elif pilihan == 7:
+            delete_rekam()
+        elif pilihan == 8:
             print("Logout dari program")
             break
         else:
