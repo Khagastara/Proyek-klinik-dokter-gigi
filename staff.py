@@ -71,7 +71,6 @@ def search_rekam_pasien():
     cur.close()
     conn.close()
 
-
 def add_rekam():
     conn = connect()
     cur = conn.cursor()
@@ -82,6 +81,7 @@ def add_rekam():
     diagnosis = (f"Masukkan nama diagnosis pada pasien: ")
     id_staff = 1
     query = f"INSERT INTO rekam_medis(id_pasien, tanggal_pemeriksaan, hasil_pemeriksaan, diagnosis) VALUES(%s, %s, %s, %s)"
+    cur.execute(query, (id_pasien, tanggal_pemeriksaan, hasil_pemeriksaan, diagnosis, id_staff))
     conn.commit()
     read_rekam_medis()
     cur.close
@@ -126,6 +126,7 @@ def delete_rekam():
     konfirmasi = input(f"Apakah Anda yakin ingin menghapus dengan nomor rekam {nomor_rekam} ini?: (yes/no)")
     if konfirmasi.lower() == 'yes':
         query_delete = f"DELETE FROM rekam_medis WHERE nomor_rekam = {nomor_rekam}"
+        cur.execute(query_delete, (nomor_rekam))
     elif konfirmasi.lower() == 'no':
         print("Penghapusan dibatalkan")
     else:
