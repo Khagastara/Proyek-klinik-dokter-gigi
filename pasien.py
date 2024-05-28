@@ -133,7 +133,19 @@ def add_transaksi(nama):
         return
 
     id_pasien = id_pasien[0]
-
+    id_pembayaran = cur.fetchone()
+    
+    print("Pilih Resep Obat:")
+    cur.execute("SELECT id_resep, daftar_obat, jumlah_obat, harga FROM resep_obat")
+    resep_data = cur.fetchall()
+    print(tabulate(resep_data, headers=["ID Resep", "Daftar Obat", "Jumlah", "Harga"], tablefmt="outline"))
+    
+    total_input = int(input("Masukkan jumlah jenis obat yang ingin dibeli: "))
+    for _ in range(total_input):
+        id_resep = int(input("Masukkan ID resep yang ingin dibeli: "))
+        cur.execute("INSERT INTO detail_pembayaran(id_pasien, id_resep, id_pembayaran) VALUES (%s, %s, %s)", (id_pasien, id_resep, id_pembayaran))
+        print(f"Transaksi untuk resep ID {id_resep} berhasil ditambahkan.")
+        
     # Choose payment method
     print("Metode Pembayaran:")
     cur.execute("SELECT * FROM metode_pembayaran")
@@ -174,19 +186,6 @@ def add_transaksi(nama):
             cur.close()
             conn.close()
 
-    id_pembayaran = cur.fetchone()
-
-    print("Pilih Resep Obat:")
-    cur.execute("SELECT id_resep, daftar_obat, jumlah_obat, harga FROM resep_obat")
-    resep_data = cur.fetchall()
-    print(tabulate(resep_data, headers=["ID Resep", "Daftar Obat", "Jumlah", "Harga"], tablefmt="outline"))
-
-    total_input = int(input("Masukkan jumlah jenis obat yang ingin dibeli: "))
-    for _ in range(total_input):
-        id_resep = int(input("Masukkan ID resep yang ingin dibeli: "))
-        cur.execute("INSERT INTO detail_pembayaran(id_pasien, id_resep, id_pembayaran) VALUES (%s, %s, %s)", (id_pasien, id_resep, id_pembayaran))
-        print(f"Transaksi untuk resep ID {id_resep} berhasil ditambahkan.")
-
     # Confirmation
     konfirmasi = input("Apakah Anda yakin ingin menyimpan transaksi ini? (yes/no): ")
     if konfirmasi.lower() == 'yes':
@@ -198,8 +197,9 @@ def add_transaksi(nama):
                         JOIN resep_obat re ON(d.id_resep = re.id_resep)
                         JOIN metode_pembayaran m ON(pe.id_metode = m.id_metode)
                         JOIN bank b ON(pe.id_bank = b.id_bank)
-                        WHERE pa.nama ilike '{nama}
-                        ORDER BY id_pasien DESC'"""
+                        WHERE pa.nama ilike '{nama}'
+                        ORDER BY pe.tanggal_pembayaran DESC
+                        LIMIT '{total_input}'"""
         cur.execute(query_latest)
         conn.commit()
         data = cur.fetchall()
