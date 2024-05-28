@@ -133,7 +133,6 @@ def add_transaksi(nama):
         return
 
     id_pasien = id_pasien[0]
-    id_pembayaran = cur.fetchone()
     
     print("Pilih Resep Obat:")
     cur.execute("SELECT id_resep, daftar_obat, jumlah_obat, harga FROM resep_obat")
@@ -141,9 +140,10 @@ def add_transaksi(nama):
     print(tabulate(resep_data, headers=["ID Resep", "Daftar Obat", "Jumlah", "Harga"], tablefmt="outline"))
     
     total_input = int(input("Masukkan jumlah jenis obat yang ingin dibeli: "))
+    id_resep_list = []
     for _ in range(total_input):
         id_resep = int(input("Masukkan ID resep yang ingin dibeli: "))
-        cur.execute("INSERT INTO detail_pembayaran(id_pasien, id_resep, id_pembayaran) VALUES (%s, %s, %s)", (id_pasien, id_resep, id_pembayaran))
+        id_resep_list.append(id_resep)
         print(f"Transaksi untuk resep ID {id_resep} berhasil ditambahkan.")
         
     # Choose payment method
@@ -157,7 +157,11 @@ def add_transaksi(nama):
     while True:
         id_metode = int(input("Pilih ID metode pembayaran: "))
         if id_metode == 1:
-            bank = 6  # non-Bank
+            id_bank = 6  # non-Bank
+            bank_method =   """INSERT INTO pembayaran(tanggal_pembayaran, id_metode, id_bank)
+                                    VALUES(%s,%s,%s) RETURNING id_pembayaran"""
+            cur.execute(bank_method, (tanggal_pembayaran, id_metode, id_bank))
+            conn.commit() 
             break
         elif id_metode == 2:
             os.system("cls")
@@ -174,7 +178,7 @@ def add_transaksi(nama):
                     bank_method =   """INSERT INTO pembayaran(tanggal_pembayaran, id_metode, id_bank)
                                     VALUES(%s,%s,%s) RETURNING id_pembayaran"""
                     cur.execute(bank_method, (tanggal_pembayaran, id_metode, id_bank))
-                    conn.commit()
+                    conn.commit()                    
                     break     
                 else:
                     print("Pilihan tidak ada")
@@ -185,30 +189,37 @@ def add_transaksi(nama):
             print("Metode pembayaran tidak valid.")
             cur.close()
             conn.close()
-
+            
+    id_pembayaran = cur.fetchone()[0] 
+    
+    for id_resep in id_resep_list:
+        detail_resep = "INSERT INTO detail_pembayaran(id_pasien, id_resep, id_pembayaran) VALUES (%s, %s, %s) RETURNING id_detail"
+        cur.execute(detail_resep, (id_pasien, id_resep, id_pembayaran))   
     # Confirmation
-    konfirmasi = input("Apakah Anda yakin ingin menyimpan transaksi ini? (yes/no): ")
-    if konfirmasi.lower() == 'yes':
-        conn.commit()
-        query_latest =  f"""SELECT pa.nama, pe.tanggal_pembayaran, re.daftar_obat, re.harga, m.metode_pembayaran, b.nama_bank
-                        FROM pasien pa
-                        JOIN detail_pembayaran d ON(pa.id_pasien = d.id_pasien)
-                        JOIN pembayaran pe ON(d.id_pembayaran = pe.id_pembayaran)
-                        JOIN resep_obat re ON(d.id_resep = re.id_resep)
-                        JOIN metode_pembayaran m ON(pe.id_metode = m.id_metode)
-                        JOIN bank b ON(pe.id_bank = b.id_bank)
-                        WHERE pa.nama ilike '{nama}'
-                        ORDER BY pe.tanggal_pembayaran DESC
-                        LIMIT '{total_input}'"""
-        cur.execute(query_latest)
-        conn.commit()
-        data = cur.fetchall()
-        col_names = [desc[0] for desc in cur.description]
-        print("Pembayaran berhasil ditambahkan.")
-        print(tabulate(data, headers=col_names, tablefmt="outline"))
-    else:
-        conn.rollback()
-        print("Transaksi dibatalkan.")
+    while True:
+        konfirmasi = input("Apakah Anda yakin ingin menyimpan transaksi ini? (yes/no): ")
+        if konfirmasi.lower() == 'yes':
+            conn.commit()
+            query_latest =  f"""SELECT pa.nama, d.id_detail, pe.tanggal_pembayaran, re.daftar_obat, re.harga, m.metode_pembayaran, b.nama_bank
+                            FROM pasien pa
+                            JOIN detail_pembayaran d ON(pa.id_pasien = d.id_pasien)
+                            JOIN pembayaran pe ON(d.id_pembayaran = pe.id_pembayaran)
+                            JOIN resep_obat re ON(d.id_resep = re.id_resep)
+                            JOIN metode_pembayaran m ON(pe.id_metode = m.id_metode)
+                            JOIN bank b ON(pe.id_bank = b.id_bank)
+                            WHERE pa.nama ilike '{nama}'
+                            ORDER BY pe.tanggal_pembayaran DESC
+                            LIMIT '{total_input}'"""
+            cur.execute(query_latest)
+            conn.commit()
+            data = cur.fetchall()
+            col_names = [desc[0] for desc in cur.description]
+            print("Pembayaran berhasil ditambahkan.")
+            print(tabulate(data, headers=col_names, tablefmt="outline"))
+            break
+        else:
+            conn.rollback()
+            print("Transaksi dibatalkan.")
 
     cur.close()
     conn.close()
