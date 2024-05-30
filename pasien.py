@@ -22,7 +22,7 @@ def add_pasien(nama):
     existing_pasien = cur.fetchall()
     
     if existing_pasien:
-        print(f"Pasien {nama} sudah ada di dalam data")
+        print(f"Selamat Datang, {nama}!")
     else:
         print("Silahkan membuat data Pasien baru")
         jenis_kelamin = input("Masukkan jenis kelamin pasien: (Laki-laki/Perempuan) ")
@@ -35,6 +35,7 @@ def add_pasien(nama):
         nomor_telepon = int(input("Masukkan nomor telepon Anda: "))
         alamat = input("Masukkan alamat Anda: ")
         konfirmasi = input("Apakah Anda yakin ingin menambah pasien sesuai dengan yang diinginkan? (yes/no): ")
+        
         if konfirmasi.lower() == 'yes':
             conn.commit()
             print("Data Pasien baru telah dimasukkan.")
@@ -54,10 +55,13 @@ def add_pasien(nama):
                 print("\nDetail Pasien Terbaru:")
                 col_names = [desc[0] for desc in cur.description]
                 print(tabulate([latest_pasien], headers=col_names, tablefmt="outline"))
+                
         else:
             os.system("cls")
             conn.rollback()
             print("Membuat data Pasien baru telah dibatalkan.")
+            
+        print(f"Selamat Datang, {nama}!")
         cur.close()
         conn.close()
 
@@ -227,28 +231,28 @@ def add_transaksi(nama):
 def menuPasien():
     os.system("cls")
     nama = input("Masukkan nama pasien: ")
-    print(f"Selamat datang pasien {nama}")
+    add_pasien(nama)
     while True:
-        print("\nMenu:")
-        print("1. Konfirmasi Data Pasien (Anda)")
-        print("2. Melihat Data Pasien (Anda)")
-        print("3. Melihat Data Rekam Medis Anda")
-        print("4. Histori Pembayaran")
-        print("5. Membayar Transaksi")
-        print("6. Logout")
+        print("\n" + "+" + "-"*40 + "+")
+        print("|" + " " * 18 + "Menu" + " " * 18 + "|")
+        print("\n" + "+" + "-"*40 + "+")
+        print("| 1. Melihat Data Pasien (Anda)" + " " * 10 + "|")
+        print("| 2. Melihat Data Rekam Medis Anda" + " " * 7 + "|")
+        print("| 3. Histori Pembayaran" + " " * 18 + "|")
+        print("| 4. Membayar Transaksi" + " " * 18 + "|")
+        print("| 5. Logout " + " " * 29 + "|")
+        print("+" + "-"*40 + "+")
         pilihan = int(input("Masukkan pilihan: "))
         
         if pilihan == 1:
-            add_pasien(nama)
-        elif pilihan == 2:
             read_pasien(nama)
-        elif pilihan == 3:
+        elif pilihan == 2:
             read_rekam(nama)
-        elif pilihan == 4:
+        elif pilihan == 3:
             read_pembayaran(nama)
-        elif pilihan == 5:
+        elif pilihan == 4:
             add_transaksi(nama)
-        elif pilihan == 6:
+        elif pilihan == 5:
             os.system("cls")
             print("Logout dari program")
             break
@@ -258,3 +262,4 @@ def menuPasien():
 
 if __name__ == "__main__":
     menuPasien()
+    
