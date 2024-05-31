@@ -79,10 +79,10 @@ CONSTRAINT fk_pembayaran
 CREATE TABLE rekam_medis(
 	nomor_rekam SERIAL PRIMARY KEY,
 	id_pasien INT,
+	id_staff INT,
 	tanggal_pemeriksaan DATE NOT NULL,
 	hasil_pemeriksaan VARCHAR(300) NOT NULL,
 	diagnosis VARCHAR(100) NOT NULL,
-	id_staff INT,
 CONSTRAINT fk_staff
 	FOREIGN KEY ("id_staff")
 	REFERENCES staff ("id_staff")
@@ -107,12 +107,12 @@ VALUES ('Amara Kanya Maharani', 'Perempuan', '085748435663');
 select * from staff;
 
 INSERT INTO bank(nama_bank)
-VALUES	('non-Bank'),
-		('BRI'),
+VALUES	('BRI'),
 		('BCA'),
 		('BNI'),
 		('Mandiri'),
-		('BSI');
+		('BSI'),
+		('non-Bank');
 SELECT * FROM bank;
 
 INSERT INTO pasien(nama, jenis_kelamin, nomor_telepon, alamat)
@@ -124,10 +124,10 @@ VALUES 	('Adit', 'Laki-laki', '082324678212', 'Jl. Jawa VI'),
 SELECT * FROM pasien;
 
 INSERT INTO pembayaran(tanggal_pembayaran, id_metode, id_bank)
-VALUES 	('2024-5-14', 1, 1),
+VALUES 	('2024-5-14', 1, 6),
 		('2024-5-16', 2, 3),
 		('2024-5-20', 2, 2),
-		('2024-5-21', 1, 1),
+		('2024-5-21', 1, 6),
 		('2024-5-21', 2, 2);
 SELECT * FROM pembayaran;
 
