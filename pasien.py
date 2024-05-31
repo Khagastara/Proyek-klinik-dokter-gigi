@@ -1,5 +1,6 @@
 import psycopg2
 import datetime
+import main as ma
 import os
 from tabulate import tabulate
 
@@ -139,7 +140,7 @@ def add_transaksi(nama):
     id_pasien = id_pasien[0]
     
     print("Pilih Resep Obat:")
-    cur.execute("SELECT id_resep, daftar_obat, jumlah_obat, harga FROM resep_obat")
+    cur.execute("SELECT id_resep, daftar_obat, jumlah_obat, harga FROM resep_obat ORDER BY id_resep ASC")
     resep_data = cur.fetchall()
     print(tabulate(resep_data, headers=["ID Resep", "Daftar Obat", "Jumlah", "Harga"], tablefmt="outline"))
     
@@ -198,12 +199,15 @@ def add_transaksi(nama):
     
     for id_resep in id_resep_list:
         detail_resep = "INSERT INTO detail_pembayaran(id_pasien, id_resep, id_pembayaran) VALUES (%s, %s, %s) RETURNING id_detail"
-        cur.execute(detail_resep, (id_pasien, id_resep, id_pembayaran))   
-    # Confirmation
+        cur.execute(detail_resep, (id_pasien, id_resep, id_pembayaran))
+        obatminus = f"UPDATE resep_obat SET jumlah_obat = jumlah_obat - 1 WHERE id_resep = {id_resep}"
+        cur.execute(obatminus)
+            
     while True:
         konfirmasi = input("Apakah Anda yakin ingin menyimpan transaksi ini? (yes/no): ")
         if konfirmasi.lower() == 'yes':
             conn.commit()
+            
             query_latest =  f"""SELECT pa.nama, d.id_detail, pe.tanggal_pembayaran, re.daftar_obat, re.harga, m.metode_pembayaran, b.nama_bank
                             FROM pasien pa
                             JOIN detail_pembayaran d ON(pa.id_pasien = d.id_pasien)
@@ -215,7 +219,6 @@ def add_transaksi(nama):
                             ORDER BY pe.tanggal_pembayaran DESC
                             LIMIT '{total_input}'"""
             cur.execute(query_latest)
-            conn.commit()
             data = cur.fetchall()
             col_names = [desc[0] for desc in cur.description]
             print("Pembayaran berhasil ditambahkan.")
@@ -224,6 +227,7 @@ def add_transaksi(nama):
         else:
             conn.rollback()
             print("Transaksi dibatalkan.")
+            break
 
     cur.close()
     conn.close()
@@ -235,12 +239,13 @@ def menuPasien():
     while True:
         print("\n" + "+" + "-"*40 + "+")
         print("|" + " " * 18 + "Menu" + " " * 18 + "|")
-        print("\n" + "+" + "-"*40 + "+")
+        print("+" + "-"*40 + "+")
         print("| 1. Melihat Data Pasien (Anda)" + " " * 10 + "|")
         print("| 2. Melihat Data Rekam Medis Anda" + " " * 7 + "|")
         print("| 3. Histori Pembayaran" + " " * 18 + "|")
         print("| 4. Membayar Transaksi" + " " * 18 + "|")
         print("| 5. Logout " + " " * 29 + "|")
+        print("| 6. Pergi ke Main " + " " * 22 + "|")
         print("+" + "-"*40 + "+")
         pilihan = int(input("Masukkan pilihan: "))
         
@@ -255,6 +260,10 @@ def menuPasien():
         elif pilihan == 5:
             os.system("cls")
             print("Logout dari program")
+            menuPasien()
+            break
+        elif pilihan == 6:
+            ma.main()
             break
         else:
             os.system("cls")
@@ -262,4 +271,3 @@ def menuPasien():
 
 if __name__ == "__main__":
     menuPasien()
-    
