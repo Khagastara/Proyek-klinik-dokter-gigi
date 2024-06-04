@@ -34,10 +34,10 @@ def add_staff(nama):
             jenis_kelamin = 'Perempuan'
         else:
             print(f"Jenis kelamin {jenis_kelamin} invalid. Silahkan masukkan 'Laki-laki' atau 'Perempuan'")
-        nomor_telepon = int(input("Masukkan nomor telepon Anda: "))
+        nomor_telepon = (input("Masukkan nomor telepon Anda: "))
         
         while True:
-            konfirmasi = input("Apakah Anda yakin ingin menambah pasien sesuai dengan yang diinginkan? (yes/no): ")
+            konfirmasi = input("Apakah Anda yakin ingin menambah staff sesuai dengan yang diinginkan? (yes/no): ")
             if konfirmasi.lower() == 'yes':
                 conn.commit()
                 print("Data Pasien baru telah dimasukkan.")
@@ -46,10 +46,9 @@ def add_staff(nama):
                 cur.execute(query, (nama, jenis_kelamin, nomor_telepon))
                 conn.commit()
                 os.system("cls")
-                print("\nDetail Pembayaran Terbaru:")
-                query_latest =  """SELECT * FROM pasien WHERE nama ILIKE %s
-                                ORDER BY id_pasien DESC
-                                LIMIT 1"""
+                query_latest =  """SELECT * FROM staff
+                                WHERE nama ilike %s
+                                ORDER BY id_staff ASC"""
                 cur.execute(query_latest, (nama,))
                 latest_pasien = cur.fetchone()
                 
@@ -62,7 +61,7 @@ def add_staff(nama):
             elif konfirmasi.lower() == 'no':
                 os.system("cls")
                 conn.rollback()
-                print("Membuat data Pasien baru telah dibatalkan.")
+                print("Membuat data Staff baru telah dibatalkan.")
                 break
             else:
                 print("Pilihan invalid")
