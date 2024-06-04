@@ -155,10 +155,10 @@ VALUES 	(1, 2, 1),
 SELECT * FROM detail_pembayaran;
 
 
-INSERT INTO rekam_medis(tanggal_pemeriksaan, id_pasien, hasil_pemeriksaan, diagnosis, id_staff)
-VALUES	('2024-5-14', 1, 'Gigi lubang berwarna kehitaman pada oklusal dan proksimal gigi, tes perkusi negative, tes tekan negative, tes dingin positif.', 'Karies mencapai enamel gigi', 1),
-		('2024-5-16', 2, 'Muncul benjolan berisi cairan berwarna bening, putih, kebiruan, atau kemerahan.', 'Kista mulut', 1),
-		('2024-5-20', 3, 'Gusi gigi yang berwarna merah, lunak, atau bengkak', 'Gingivitis', 1),
-		('2024-5-21', 4, 'Penumpukan plak di gigi', 'Periodontitis', 1),
-		('2024-5-21', 5, 'Bengkak pada kelenjar getah bening di leher', 'Pulpitis', 1);
+INSERT INTO rekam_medis(tanggal_pemeriksaan, id_pasien, id_staff, hasil_pemeriksaan, diagnosis)
+VALUES	('2024-5-14', 1, 1, 'Gigi lubang berwarna kehitaman pada oklusal dan proksimal gigi, tes perkusi negative, tes tekan negative, tes dingin positif.', 'Karies mencapai enamel gigi'),
+		('2024-5-16', 2, 1, 'Muncul benjolan berisi cairan berwarna bening, putih, kebiruan, atau kemerahan.', 'Kista mulut'),
+		('2024-5-20', 3, 1, 'Gusi gigi yang berwarna merah, lunak, atau bengkak', 'Gingivitis'),
+		('2024-5-21', 4, 1, 'Penumpukan plak di gigi', 'Periodontitis'),
+		('2024-5-21', 5, 1, 'Bengkak pada kelenjar getah bening di leher', 'Pulpitis');
 SELECT * FROM rekam_medis
