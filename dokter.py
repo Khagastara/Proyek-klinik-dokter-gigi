@@ -188,7 +188,7 @@ def menuDokter():
         print("| {:<48} |".format("3. Mencari Pasien dari Data Rekam Medis"))
         print("| {:<48} |".format("4. Melihat Resep Obat"))
         print("| {:<48} |".format("5. Menambah Resep Obat"))
-        print("| {:<48} |".format("6. Menghapus Resep Obat"))
+        print("| {:<48} |".format("6. Menngedit Resep Obat"))
         print("| {:<48} |".format("7. Menghapus Resep Obat"))
         print("| {:<48} |".format("8. Logout"))
         print("| {:<48} |".format("9. Pergi ke Main"))
